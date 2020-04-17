@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="OpenLiberty Server">
+
+    <featureManager>
+        <feature>jakartaee-8.0</feature>
+        <feature>microProfile-3.0</feature>
+        <feature>usr:opentracingZipkin-0.31</feature>
+    </featureManager>
+
+    <basicRegistry id="basic" realm="MicroProfileMetrics">
+        <user name="admin" password="adminadmin"/>
+        <user name="nonadmin" password="guest"/>
+    </basicRegistry>
+    <administrator-role>
+        <user>admin</user>
+    </administrator-role>
+
+</server>

@@ -1,0 +1,226 @@
+== Prerequisites
+
+As prerequisites to perform the workshop, you need to have the following tools installed on your laptop:
+
+- Any JDK version 8 or later, e.g. https://adoptopenjdk.net/?variant=openjdk8&jvmVariant=openj9
+- https://maven.apache.org/download.cgi[Maven 3^]
+- https://git-scm.com/book/en/v2/Getting-Started-Installing-Git[git^]
+- https://curl.haxx.se/download.html[curl^] (should exist on most environments already)
+- https://docs.docker.com/install/[docker^]
+- https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl^]
+- https://cloud.ibm.com/docs/home/tools[IBM Cloud CLI^], including plugins kubernetes-service and container-registry
+- https://istio.io/docs/setup/getting-started/#download[istioctl (in version 1.5.0)^]
+
+=== Verify
+
+To verify, run the following commands in your terminal:
+- `git version`
+- `curl -iL https://www.ibm.com`
+- `docker run --rm hello-world`
+- `kubectl version`
+- `istioctl version`
+
+
+=== IBM Cloud access
+
+==== Registering IBM Cloud Account
+
+Register for an https://ibm.biz/cloud-reg-istio-ws[IBM Cloud account^].
+
+Fill in the registration form and follow the link in the validation email when it arrives.
+
+Then you can https://ibm.biz/cloud-login-istio-ws[Login into IBM Cloud^] using the account credentials you have registered.
+
+NOTE: IBM Cloud offers a Free Kubernetes cluster type that will run for 30 days at no costs.
+You can use this type once you have entered your credit card or a corresponding promo code.
+
+
+==== IBM Cloud CLI
+
+We log into the IBM Cloud CLI tool: `ibmcloud login`.
+If you have a federated account, include the `--sso` flag: `ibmcloud login --sso`.
+
+Create an API key to access the IBM Cloud CLI more conveniently.
+
+----
+ibmcloud iam api-key-create cloud-native \
+  -d "cloud-native \
+  --file cloud-native.json
+cat cloud-native.json
+----
+
+Write down the API key under the `apikey` property.
+
+Now we set the locale and unset any configuration that might exist if you have used the CLI in the past:
+
+----
+ibmcloud config --locale en_US
+ibmcloud config --check-version=false
+ibmcloud api --unset
+ibmcloud api https://cloud.ibm.com
+ibmcloud login --apikey <yourkey> -r eu-de
+----
+
+To verify that the plugins are installed properly, run `ibmcloud plugin list`.
+The Container Service plugin and Registry plugin are displayed as `container-service/kubernetes-service` and `container-registry`.
+
+
+=== IBM Kubernetes Service
+
+Now we create our Kubernetes cluster (free or standard) using the https://cloud.ibm.com/kubernetes/catalog/create[Cloud Console^] or CLI.
+A free cluster is sufficient for this workshop but feel free to create a standard cluster with your desired configuration.
+
+If you want to use the CLI continue with one of the following:
+
+For a Free cluster use the following command:
+
+----
+ibmcloud ks cluster create classic  \
+  --name cloud-native
+----
+
+For a standard cluster, in standard setting with 3 workers, use the following command:
+
+----
+ibmcloud ks cluster create classic \
+  --name cloud-native \
+  --zone fra02 \
+  --flavor b3c.4x16 \
+  --workers 3
+----
+
+NOTE: If the command fails because you have existing VLANs in that zone, you need to specify the VLANs in your command:
+----
+ibmcloud ks vlans --zone fra02
+ibmcloud ks cluster create classic \
+  --name cloud-native \
+  --zone fra02 \
+  --flavor b3c.4x16 \
+  --workers 3 \
+  --private-vlan <vlan> \
+  --public-vlan <vlan>
+----
+
+
+==== Accessing the cluster
+
+Now, we'll see how to set the context to work with our clusters by using the `kubectl` CLI, access the Kubernetes dashboard, and gather basic information about our cluster.
+
+List the available clusters: `ibmcloud ks clusters`.
+This command should now show your cluster which is being created.
+
+
+After the cluster is up-and-running, download the configuration file and certificates for the cluster using the `cluster config` command:
+
+----
+ibmcloud ks cluster config --cluster cloud-native
+----
+
+Get basic information about the cluster and its worker nodes.
+This information can help you managing the cluster and troubleshoot issues.
+
+Get the details of your cluster: `ibmcloud ks cluster get --cluster cloud-native`
+
+Verify the nodes in the cluster:
+
+----
+ibmcloud ks workers --cluster cloud-native
+kubectl get nodes
+----
+
+View the currently available services, deployments, and pods:
+
+----
+kubectl get svc,deploy,po --all-namespaces
+----
+
+==== Installing Istio
+
+Now, we're installing Istio:
+
+----
+istioctl manifest apply --set profile=demo
+----
+
+This will install Istio 1.5.0 with distributed tracing, Grafana monitoring, and Kiali.
+
+Check that all pods are running before continuing.
+
+----
+kubectl get pod -n istio-system
+----
+
+We can verify our Istio installation as follows:
+
+----
+istioctl manifest generate --set profile=demo > generated-manifest.yaml
+istioctl verify-install -f generated-manifest.yaml
+----
+
+The result of the second command (last 3 lines) looks like this:
+ 
+----
+Checked 25 crds
+Checked 3 Istio Deployments
+Istio is installed successfully
+----
+ 
+We then enable the automatic sidecar injection:
+
+----
+kubectl label namespace default istio-injection=enabled
+----
+
+This will enable automatic sidecar injection for the `default` namespace.
+
+Congratulations! We now successfully installed Istio into our cluster.
+
+
+==== Container Registry
+
+In order to build and distribute Docker images, we need a Docker registry.
+We can use the IBM Container Registry which can be accessed right away from our Kubernetes cluster.
+
+We log into the Container Registry service via the `ibmcloud` CLI and obtain the information about our registry:
+
+----
+ibmcloud cr login
+ibmcloud cr region-set eu-central
+ibmcloud cr region
+You are targeting region 'eu-central', the registry is 'de.icr.io'.
+----
+
+We use the CLI to create a unique namespace in the Container Registry service (`cr`) for our workshop:
+
+----
+ibmcloud cr namespace-add istio-ws-<your-name>
+ibmcloud cr namespaces
+----
+
+In order to test our new registry namespace, we pull a public image, re-tag it for our own registry, for our region, and push it:
+
+----
+docker pull hello-world
+docker tag hello-world de.icr.io/istio-ws-<your-name>/hello-world:1
+docker push de.icr.io/istio-ws-<your-name>/hello-world:1
+----
+
+Let's see whether our image is now in the private registry:
+
+----
+ibmcloud cr images
+----
+
+NOTE: In all following examples, you will need to adapt the image / namespace name!
+This is important to take into consideration, otherwise the examples won't work since the images won't exist in your account.
+
+=== Local Docker setup
+
+If you want to try out the example locally, you have to create a Docker network similar to the following:
+
+----
+docker network create --subnet=192.168.42.0/24 dkrnet
+----
+
+Now, we've finished all preparations.
+Let's get started with the link:01-introduction.adoc[workshop].
