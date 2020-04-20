@@ -41,7 +41,7 @@ public class OrdersResource {
 
     private JsonObject buildOrder(CoffeeOrder order) {
         return Json.createObjectBuilder()
-                .add("type", order.getType().name())
+                .add("type", order.getType().name().toLowerCase())
                 .add("status", order.getStatus().name())
                 .add("_self", buildUri(order).toString())
                 .build();
