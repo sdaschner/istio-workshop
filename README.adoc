@@ -1,12 +1,14 @@
 == Enterprise Coffee
 
-This is the coffee shop example project for the hands-on-lab: _Containerizing Java for the clouds_
+This is a hands-on workshop how to run containerized Java applications in Docker, Kubernetes, and Istio.
 
-It comprises two applications, _coffee-shop_ and _barista_, built by Java EE and MicroProfile, which are deployed to a Kubernetes and Istio cluster.
+It will guide you through creating containerized workloads and how to deploy your Enterprise Java to the cloud.
+
+The workshop comprises two applications, _coffee-shop_ and _barista_, built by Java EE and MicroProfile, which are deployed to a Kubernetes and Istio cluster.
 
 The contents of the workshop start with the link:workshop/00-prerequisites.adoc[prerequisites].
 
 
 === Finish
 
-After you've finished the walk-through you can compare your result with the https://github.com/sdaschner/cloud-native-workshop-02-2020/tree/finish[finished version^].
+After you've finished the walk-through you can compare your result with the https://github.com/sdaschner/istio-workshop/tree/finish[finished version^].
