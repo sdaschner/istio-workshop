@@ -14,6 +14,7 @@ As prerequisites to perform the workshop, you need to have the following tools i
 === Verify
 
 To verify, run the following commands in your terminal:
+
 - `git version`
 - `curl -iL https://www.ibm.com`
 - `docker run --rm hello-world`
@@ -89,7 +90,11 @@ ibmcloud ks cluster create classic \
   --workers 3
 ----
 
-NOTE: If the command fails because you have existing VLANs in that zone, you need to specify the VLANs in your command:
+
+[NOTE]
+====================
+If the command fails because you have existing VLANs in that zone, you need to specify the VLANs in your command:
+
 ----
 ibmcloud ks vlans --zone fra02
 ibmcloud ks cluster create classic \
@@ -100,6 +105,7 @@ ibmcloud ks cluster create classic \
   --private-vlan <vlan> \
   --public-vlan <vlan>
 ----
+====================
 
 
 ==== Accessing the cluster

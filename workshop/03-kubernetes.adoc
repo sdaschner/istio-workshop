@@ -165,6 +165,7 @@ The latter enables us to simply connect to host names such as `barista`, if a se
 
 Let's have a look at the coffee-shop service definition:
 
+[source,yaml]
 ----
 kind: Service
 apiVersion: v1

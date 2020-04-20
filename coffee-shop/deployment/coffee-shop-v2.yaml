@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: coffee-shop
-        image: de.icr.io/cee-<your-name>-workshop/coffee-shop:2
+        image: de.icr.io/istio-ws-<your-name>/coffee-shop:2
         imagePullPolicy: Always
         ports:
         - containerPort: 9080
