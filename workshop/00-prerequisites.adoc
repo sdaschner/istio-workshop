@@ -26,11 +26,11 @@ To verify, run the following commands in your terminal:
 
 ==== Registering IBM Cloud Account
 
-Register for an https://ibm.biz/cloud-reg-istio-ws[IBM Cloud account^].
+Register for an https://ibm.biz/BdqPxD[IBM Cloud account^].
 
 Fill in the registration form and follow the link in the validation email when it arrives.
 
-Then you can https://ibm.biz/cloud-login-istio-ws[Login into IBM Cloud^] using the account credentials you have registered.
+Then you can https://ibm.biz/BdqPxD[Login into IBM Cloud^] using the account credentials you have registered.
 
 NOTE: IBM Cloud offers a Free Kubernetes cluster type that will run for 30 days at no costs.
 You can use this type once you have entered your credit card or a corresponding promo code.
