@@ -45,7 +45,7 @@ Create an API key to access the IBM Cloud CLI more conveniently.
 
 ----
 ibmcloud iam api-key-create cloud-native \
-  -d "cloud-native \
+  -d cloud-native \
   --file cloud-native.json
 cat cloud-native.json
 ----
